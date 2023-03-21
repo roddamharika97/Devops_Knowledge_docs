@@ -1,0 +1,34 @@
+1>?
+2a)>The difference between a public and private subnet? A public subnet has a route table that says, “send all outbound traffic (anything to the CIDR block 0.0.0.0/0) via this internet gateway.”
+  A private subnet either does not allow outbound traffic to the internet or has a route that says, “send all outbound traffic via this NAT gateway.”
+                                                                    (or)
+2b)>The instances in the public subnet can send outbound traffic directly to the internet, whereas the instances in the private subnet can't. Instead, the instances in the private subnet can access the internet by using a network address translation (NAT) gateway that resides in the public subnet.
+3>Instead, the instances in the private subnet can access the internet by using a network address translation (NAT) gateway that resides in the public subnet. The database servers can connect to the internet for software updates using the NAT gateway, but the internet cannot establish connections to the database servers.
+4>?
+5>Internet Gateway (IGW) allows instances with public IPs to access the internet.
+  NAT Gateway (NGW) allows instances with no public IPs to access the internet
+6>You can explicitly associate a subnet with a particular route table. Otherwise, the subnet is implicitly associated with the main route table. A subnet can only be associated with one route table at a time, but you can associate multiple subnets with the same subnet route table.
+7>              An AWS virtual private cloud (VPC) is a virtual network associated with your AWS account. It represents a logical network that is isolated from other resources in the AWS public cloud. VPCs consist of several discrete components and have been described loosely as a “mini datacenter” that runs in AWS. In the VPC, organizations host EC2 instances and other AWS resources. Management of the VPC is done through the AWS Management Console, or through software automation using Terraform or CloudFormation.
+
+Some common use cases for VPCs include:
+
+Hosting Web Applications
+Hosting a Web or E-commerce site
+Migrating workloads to the AWS cloud
+Extending a Data Center to the cloud (Hybrid Cloud)
+Backup or Disaster Recovery
+8>VPC networking components
+PDF
+Kindle
+RSS
+8>     You can use the following components to configure networking in your VPC.
+
+Components
+
+Internet gateways
+Egress-only internet gateways
+Carrier gateways
+NAT devices for your VPC
+DHCP options sets for your VPC
+DNS support for your VPC
+Prefix lists

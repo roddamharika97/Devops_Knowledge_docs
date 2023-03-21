@@ -1,0 +1,165 @@
+ Difference between Docker Image and Docker Container :
+
+Docker images are read-only templates used to build containers.
+Containers are deployed instances created from those templates.
+Images and containers are closely related and are essential in powering the docker software plateform.
+
+S.NO		Docker Image					Docker Container
+1	It is Blueprint of the Container.			It is instance of the Image.
+2	Image is a logical entity.				Container is a real world entity.
+3	Image is created only once.				Containers are created any number of times using image.
+4	Images are immutable.					Containers changes only if old image is deleted and new is used to build the container.
+5	Images does not require computing resource to work.	Containers requires computing resources to run as they run as Docker Virtual Machine.
+
+6	To make a docker image, you have to write script in Dockerfile.		To make container from image, you have to run “docker build .” command
+7	Docker Images are used to package up applications and pre-configured server environments.	Containers use server information and file system provided by image in order to operate.
+8	Images can be shared on Docker Hub.	It makes no sense in sharing a running entity, always docker images are shared.
+9	There is no such running state of Docker Image.	Containers uses RAM when created and in running state.
+
+
+what is the difference between cmd and run in docker?
+
+RUN and CMD are both Dockerfile instructions.
+RUN lets you execute commands inside of your Docker image. These commands get executed once at build time and get written into your Docker image as a new layer.
+For example if you wanted to install a package or create a directory inside of your Docker image then RUN will be what you’ll want to use. For example, RUN mkdir -p /path/to/folder.
+CMD lets you define a default command to run when your container starts.
+This is a run-time operation, but you still need to re-build your Docker image to change what your CMD does. A running image is called a container btw.
+For example, if you were creating a Dockerfile for your own web application, a reasonable CMD to have would be to start your web application’s app server.
+
+entrypoint vs cmd?
+
+RUN executes command(s) in a new layer and creates a new image. E.g., it is often used for installing software packages.
+CMD sets default command and/or parameters, which can be overwritten from command line when docker container runs.
+ENTRYPOINT configures a container that will run as an executable.
+EX:
+entrypoint sh roddam.sh
+cmd roddam,harika
+docker run -it --entrypoint xyz,abc
+
+what is on-build instruction in docker?
+
+The ONBUILD instruction adds to the image a trigger instruction to be executed at a later time, when the image is used as the base for another build. The trigger will be executed in the context of the downstream build, as if it had been inserted immediately after the FROM instruction in the downstream Dockerfile.
+Ex:
+onbuild apt-get install nginx -----> abc dockerfile
+From abc  ------> xyz docker file
+defaultly te onbuild instruction will execute in xyz dockerfile too
+
+what is arg vs env?
+
+ENV name "harika"
+ARG age="24"
+Ex:
+docker build -t image:version --build-arg age=24
+docker run -it --env name=roddam imageid 
+
+what is default network type in docker?
+
+bridge ----> default, host, none
+
+How do you mount volumes in docker?
+
+sudo docker volume ls 
+sudo docker volume create nginx_log
+sudo docker volume inspect geeksforgeeks
+sudo docker run -it -v /var/lib/docker/volumes/nginx_log:/var/log/nginx --name my-container-01 ubuntu
+
+ls
+cd /shared-volume
+echo “GeeksforGeeks” > geeksforgeeks.txt
+ls
+exit
+
+sudo docker run -it -v /var/lib/docker/volumes/nginx_log:/var/log/nginx --name my-container-02 ubuntu
+
+
+What are the different restart policies in docker?
+
+no – This policy will never automatically start a container. This is the default policy for all containers created with docker run.
+always – Docker will ensure the container is always running. If the container stops, it will be immediately restarted. You can still manually stop the container with docker stop but Docker will bring it back up next time the daemon restarts.
+on-failure – The container will get restarted if it stops because of an error. Docker won’t bring the container up after the daemon restarts.
+unless-stopped – This functions similarly to always. The difference is that Docker won’t ever restart the container if it has been manually stopped.
+
+
+How do different docker containers communicate each other?
+
+Whenever we created container at that time container will create virtual network protocals. Through this protocal can communicate each other.
+for example through api mechanism will fetch the objects.
+http://10.20.0.0:8080/index.html
+
+
+How are docker containers isolated?
+
+When docker containers created by default docker creates a namespaces to each and every container. Using this namespace technology docker containers are isolated
+
+
+can we mention two base images in docker file?
+
+With multi-stage builds, you use multiple FROM statements in your Dockerfile. Each FROM instruction can use a different base, and each of them begins a new stage of the build. You can selectively copy artifacts from one stage to another, leaving behind everything you don’t want in the final image. To show how this works, let’s adapt the Dockerfile from the previous section to use multi-stage builds.
+
+Dockerfile:
+
+# syntax=docker/dockerfile:1
+FROM golang:1.16 AS Go
+WORKDIR /go/src/github.com/alexellis/href-counter/
+RUN go get -d -v golang.org/x/net/html  
+COPY app.go ./
+RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o app .
+
+FROM alpine:latest  
+RUN apk --no-cache add ca-certificates
+WORKDIR /root/
+COPY --from=Go /go/src/github.com/alexellis/href-counter/app ./
+CMD ["./app"]
+
+How to port-forward in docker?
+
+
+What is from,copy,expose,run,arg,cmd,entrypoint,volume,onbuild,stopsignal,label,env,add,copy,workdir,user?
+
+WORKDIR --> The WORKDIR instruction sets the working directory for any RUN, CMD, ENTRYPOINT, COPY and ADD instructions that follow it in the Dockerfile.
+            To mention the absolute direcotry of your workdirectory. Note: This location is inside your container
+
+VOLUME --> Instruction should be used to expose any database storage area, configuration storage, or files/folders created by your docker container
+
+ENTRYPOINT --> The best use of ENTRYPOINT is to set the image’s main command, allowing that image to be run 
+
+COPY --> it is used to copy local files to the container(Note: the files should be in the direcotry where Dockerfile presents or in the sub directories)
+         ex: COPY myfile.txt /tmp/
+
+ADD -->  To download the files remotely and place in container
+         ex: ADD http://example.com/big.tar.xz /usr/src/things/
+
+EXPOSE --> It is used to mention the port which the services are running
+          ex: EXPOSE 8080 (Default for tomcat) 
+
+RUN ---> RUN lets you execute commands inside of your Docker image. 
+         These commands get executed once at build time and get written into your Docker image as a new layer.
+         For example if you wanted to install a package or create a directory inside of your Docker image then RUN will be what you’ll want to use. 
+         For example, RUN mkdir -p /path/to/folder 
+
+LABEL  The LABEL instruction adds metadata to an image. A LABEL is a key-value pair. To include spaces within a LABEL value, use quotes and backslashes as you would in command-line parsing
+
+CMD --> CMD lets you define a default command to run when your container starts.
+        For example start the tomcat service on container starting time...
+        Referecfen link: https://nickjanetakis.com/blog/docker-tip-7-the-difference-between-run-and-cmd
+		Note: ENTRYPOINT overwrite the CMD commands. And CMD can be overwritten during the runtime of docker container
+
+
+he ENTRYPOINT specifies a command that will always be executed when the container starts. The CMD specifies arguments that will be fed to the ENTRYPOINT
+
+ARG  instruction defines a variable that users can pass at build-time to the builder with the docker build command using the --build-arg <varname>=<value> flag.
+
+ONBUILD  The ONBUILD instruction adds to the image a trigger instruction to be executed at a later time, when the image is used as the base for another build. The trigger will be executed in the context of the downstream build, as if it had been inserted immediately after the FROM instruction in the downstream Dockerfile (https://vsupalov.com/docker-build-time-env-values/)
+
+
+How do you create new image from container?
+
+docker commit containerid image:version
+
+How do you push to repository?
+
+docker login -u username -p password dockerhub-hostname:port
+docker login -u stangutu -p Sai@123 ciscoiotdockerhub:8090
+docker tag imageid ciscoiotdockerhub:8090/Nginx:1.21
+docker push ciscoiotdockerhub:8090/Nginx:1.21
+docker pull ciscoiotdockerhub:8090/Nginx:1.21

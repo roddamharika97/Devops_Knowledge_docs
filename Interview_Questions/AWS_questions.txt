@@ -1,0 +1,312 @@
+VPC:
+
+What are the different services u worked in aws?
+
+Ec2, s3,subnets,EBS,EFS, Vpc, load balancers, IAM, Auto scaling
+
+What is the difference between private subnet vs public subnet?
+
+Instances in public subnet can get direct internet connectivity whereas instances in private subnet will not get direct internet connectivity data.
+
+How do I get internet connectivity to the instances posted in private subnet?
+
+We can use nat gateway that should be created in public subnet that route will be used as a route for private subnet route table.
+
+Db servers are hosted in which subnet?
+
+private subnet
+
+What is natgateway & internet gateway?
+
+Both are used to allow the internet traffic to the subnet
+IGW allows instances with public ips to access the internet
+NGW allow instances with no public ips to access the internet
+
+can one route associated with multiple route tables or not?
+
+
+Can 1 route table have multiple subnets or not?
+
+yes
+
+What is vpc & its use cases?
+
+vpc is nothing but a virtual private cloud. It is an isolated network zone where you can establish your connectivity , security & other resources
+
+vpc components?
+
+Subnet creation
+Route table
+Internet connectivity
+Avalabiity zone
+IGw, NGW
+=============================================================================================================================
+EC2:
+
+Can we attach multiple private address to 1 ec2 instance? How?
+
+yes,we can attach multiple private address to one ec2 instance, while creating ec2 instance in IP section we can give our list of private ip addresses
+
+can we modify security group settings after creating the ec2 instance?
+
+Yes,we can modify security group settings after creating the ec2 instance.
+in actions ---> change security groups
+
+What is security group & nacl?
+
+Both security group & NACL are used to control the internet traffic. Here NACL stands at subnet level, security groups stands at instance level.
+By default NACL stands at subnet level, security groups(stateful) stands at instance level.
+By default NACl allows inbound & outbound traffic from all the ports whereas securiy groups by default denies all the traffic.
+NACL(stateless) has highest presidency than security group because NACL stands at subnet level.
+NACL can be understood as the firewall or protection for the subnet. Security group can be understood as a firewall to protect EC2 instances
+
+What is inbound & outbound traffic?
+
+Inbound rule control the incoming traffic to your instance.
+Outbound rule control the outgoing traffic from your instance.
+
+How do you encrypt volumes in ec2?
+
+kms(key management service) ----> create key ---> symmetric--->alias (mykms)--->tag--->Key administrators--->This account--->finish
+symmetric ---> A single encryption key that is used for both encrypt and decrypt operations
+Asymmetric--->A public and private key pair that can be used for encrypt/decrypt or sign/verify operations
+
+First Procces to encrypt volume: 
+Due to creation of instanace itself we can encrypt the volume in the step of add storage part ...there we can see encryption --->
+we can select our kms key will do encrypt the volume.
+
+is it possible to encrypt volume after ec2 creation?
+
+yes....
+Second process to encrypt volume:
+After creation of instance we can encrypt the volume.
+1.Under volume section After selecting volume ...under details we can see volume not encrypted.
+2.First we need to create snapshot through volume. by selecting volume---> click on actions---> create snapshot.
+3.Gotosnapshot page--->select snapshot--->create volume from snaphot--->need to give same region as equal to ec2 instance region-->select our kmskey->create volume
+4.Stop the instance first.
+5.Then goto volumes--->detach the root volume from instance.
+6.Rename the other volume--->which one u need to attach to sda1---> then restart the ec2 instance.
+
+How frequently you take the snapshots of ec2 volumes?
+
+Once in a day 6AM in the morning.
+
+================================================================================================================================
+Load balancers:
+
+What are the different load balancers?
+
+Classic, Application,Network, Gateway
+
+Which load balancer you are using in your organisation?
+
+Application & Network
+Application lb - layer 7
+network lb - layer 4
+
+What is layer 7 & layer 4?
+
+L4 load balancing works at the highest level of the OSI model . 
+L7 bases its routing decisions on various characteristics of the HTTp, HTTPS, headers the content of the message ,the url type & information in cookies.
+
+What is stickyness?
+
+after creating load balancer & target group ---> Go to target group ---> click on particular target group ---->attributes ----> edit attributes ----> enable stickyness.
+Load balancer generated cookie
+Application-based cookie
+Stickiness duration
+1 day ----> save changes
+
+What is healthy & unhealthy treshhold , time intervals?
+
+Healthy threshold is the number of consecutive health checks success require before moving the instance to the healthy state. 
+While unhealthy treshold is the number of consecutive health check failures required before moving the instance to the unhealthy state.
+
+what is target group in load balancer & how do you attach & detach instances through target groups?
+
+Target group tells a load balancer where to direct traffic to EC2 instances, fixed ip addresses  or AWS lambda functions, 
+amongst others when creating a load balancers, you create one of move listeners & configure listener values to direct the traffic to one target group.
+
+What is vertical autoscaling vs horizontal autoscaling?
+
+Horizontal scaling is the act of changing the number of nodes in a computing system without changing the size of any individual node .
+Vertifical scaling is increasing the size & computing power of a single instance or node without increasing the number of nodes or instances.
+
+What is min max desired capacity in autoscaling?
+
+
+AMI - Amazon machine image
+How do you take ami's automatically?
+
+Through PAcker script.
+
+================================================================================================================================
+IAM:
+
+what is the difference between user & role?
+User is authenticated to use the aws services.
+Where as role to have communication between various aws services.
+
+What are policies in IAM?
+
+Policis are set off permissions that are associated with any identity or resources in aws.
+Ex: AmazonS3FullAccess, AmazonS3ReadOnlyAccess, AmazonEC2FullAccess,AmazonEC2ReadOnlyAccess,AdministratorAccess
+
+What are roles in IAM?
+
+A role can be used to establish the communication between different aws services.
+
+If any one of the iam key's expires how do you rotate them?
+
+Users ---> harika ----> security credentials ----> create new ---> make an inactive(old one)
+
+
+How do you attach policies to groups?
+
+user groups---> create group---> group name---> add users---> add policies---> create
+
+What is group & user?
+
+group is nothing but set of policies and the policies which are present in that group applicable to all the users associated with that group.
+
+What is difference between programatic access vs console access?
+
+console acccess is nthing but aws management ui access
+programmatic access is nothing but used to establish api communication, aws cli
+
+================================================================================================================================
+S3:
+
+How do you host static website with help of s3?
+
+s3--> bucket--->Properties--->static website hosting--->enable---->index.html--->save changes
+object--->actions--->make pulic via acl--->make public--->close --->click on object--->click access url
+
+What are different storage types in s3?
+
+S3 contains four types of storage classes:
+S3 Standard. S3 Standard IA. S3 one zone-infrequent access. S3 Glacier.
+
+Which storage type you used in your organisation?
+
+using standard ---> highly senstive data we want to retrive as soon as possible
+
+
+What is versioing in s3 bucket?
+
+In the Buckets list, choose the name of the bucket that you want to enable versioning for.
+Choose Properties.
+Under Bucket Versioning, choose Edit.
+Choose Suspend or Enable, and then choose Save changes.
+
+Versioning in Amazon S3 is a means of keeping multiple variants of an object in the same bucket. ... Versioning-enabled buckets can help you recover objects from accidental deletion or overwrite. For example, if you delete an object, Amazon S3 inserts a delete marker instead of removing the object permanently.
+
+How do you make communication bettween ec2 & s3?
+
+Using roles concept.
+
+What are the different volume types?
+
+ssd ---> solid state drives 
+hdd ---> hard disk drives
+There are two types of iops : 1. General purpose 2. Provisioned
+
+What is lambda function in aws?
+
+
+what is s3 object vs bucket?
+
+s3 object could be a file or image or folder anything
+bucket ---> it is a container of multiple objects
+
+
+What is paas, saas, iaas?
+
+paas ---> platform as a service Ex: kubernetes
+saas ---> software as a service Ex: sns, aws code commit
+Iaas ----> Infra as a service   Ex: Ec2, s3 bucket, servers
+
+
+What is eks?
+
+Eks is a elastic kubernetes service (pass)where we can establish our kubernetes environment
+
+what is cloud watch?
+
+It is a monitoring service, where we can see the performance metrics of various aws resources
+cpu, memory, networking, iops
+
+plottted graphs?
+
+===========================================================================================================
+EBS & EFS:
+
+What is EBS?
+
+EBS: Can only be accessed by a single Amazon EC2 instance.
+EFS: Can be accessed by 1 to 1000s of EC2 instances from multiple AZs, concurrently. EFS: File storage service for use with AWS EC2. EFS can be used as network file system for on-premise servers too using AWS Direct Connect.
+
+EFS:
+
+Amazon EFS is a cloud-based file storage service for applications and workloads that run in the Amazon Web Services public cloud. AWS automatically deploys and manages the infrastructure for Elastic File System (EFS), which is distributed across an unlimited number of servers to avoid performance bottlenecks.
+
+Sharable:
+With Elastic File System (EFS), you can share data between multiple EC2 instances and your data is replicated between multiple Availability Zones (AZ).
+Scalable:
+Amazon EFS is designed to be highly scalable both in storage capacity and throughput performance. It can grow to petabyte scale and allows massively parallel access from Amazon EC2 instances to your data
+
+EBS VS S3
+
+Simple storage service (S3) can store large amounts as compared to EBS. With S3, the standard limit is of100 buckets and each bucket has got an unlimited data capacity whereas EBS has a standard limit of 20 volumes and each volume can hold data up to 1TB. In EBS there occurs an upper limit on the data storage.
+Default 100 buckets can be created and each bucket can have max size of 5TB
+S3 is accessed via the internet using API's and EBS is accessed by the single instance attached to EBS.
+=============================================================================================================================
+
+Code build:
+
+AWS CodeBuild is a fully managed continuous integration service that compiles source code, runs tests, and produces software packages that are ready to deploy. With CodeBuild, you don’t need to provision, manage, and scale your own build servers. CodeBuild scales continuously and processes multiple builds concurrently, so your builds are not left waiting in a queue.
+
+
+To store the artifacts first we should create s3 bucket.
+To create code build:'
+1.Give the project name
+2.Source provider: (s3,AWS code commit, github,bitbucket, github enterprise)
+3.Select repository ( It is from codecommit repository)
+4.Under Environment:
+	managed image & Custom image
+	And then select operating system like ubuntu, windows like that
+5.Runtime (java, python, php, golang etc )
+6.Runtime version (openjdk etc)
+7.Under servuce role
+	New service role & Existing service role
+	for new service role code build automatically create new service role
+8.Under build spec:
+	use a buildspec file & Insert build commands
+9.Under artifacts:
+	No artifacts & Amazon s3
+	swlwct s3 & should give bucket name
+10. Under Artifact packaging:
+	None & zip
+Click on create project
+
+What are the different phases details after hitting start build:
+
+1.submitted
+2.Queued
+3.Provisioning
+4.DOWNLOAD_SOURCE
+5.Install
+6.PRE_BUILD
+7.BUILD
+8.Post build
+9.UPLOAD_ARTIFACTS
+10.FINALIZING
+11.Completed
+
+===============================================================
+Codecommit:
+
+AWS CodeCommit is a fully-managed source control service that makes it easy for companies to host secure and highly scalable private Git repositories. CodeCommit eliminates the need to operate your own source control system or worry about scaling its infrastructure.
+1.Should need IAm credentials which having AWS code commit full access policies & cloud9 environmental member policy
+2.Go to codecommit there create repository
+

@@ -1,0 +1,173 @@
+Commands to start/stop/status the service
+
+1. systemctl start/stop/status httpd24-httpd   (HTTPD Service on centos)
+2. systemctl start/stop/status apache2         (HTTPD Service on ubuntu)
+2. systemctl start/stop/status kibana
+3. systemctl start/stop/status elasticsearch
+4. systemctl start/stop/status logstash
+5. systemctl start/stop/status rabbitmq-server
+6. systemctl start/stop/status nginx
+8. systemctl start/stop/status mongod
+9. systemctl start/stop/status wso2
+10.systemctl start/stop/status openldap
+11.systemctl start/stop/status UM      (User Management)         
+12.systemctl start/stop/status KM      (Key Management)
+13.systemctl start/stop/status LM      (Location Management) 
+14.systemctl start/stop/status AUD     (Audit Log Service) 
+15.systemctl start/stop/status ACT     (Acivity Service Spring Boot)
+16.systemctl start/stop/status vault-server
+
+df -h to know the disk space of system in human readable format
+
+free -mh : memory & swap memory
+
+du -sch /* 
+
+top command is for cpu and memory usage big various process
+
+ps -aux ----> Is for procrss running in the system
+
+command | tee filename {it prints the output , as well as save into file}
+
+command | tee -a filename {it appends to the file}
+
+du -sch /* 2> /dev/null    (Check the disk usage diretory wise)
+
+du -sch --threshold=1M --block-size=1K (it gives more than  1M files, displays with 'KB' size)
+
+find . -iname "*.hprof"   (To find the hprofs in current directory)
+
+cat /dev/null > filename  (Nullify the file )
+
+cp -r --preserve logs target/logscopy  (with same timestamp)
+
+cp -r !(Default.png|example) /example   (ro resric the particular files not to copy)
+
+cp `ls | grep -v Default.png` destdir
+  
+tar -cvzf name.tar.gz /home/location of direcotry  (to tar the file)
+ 
+tar -xvf nam.tar.gz (to untar the tar.gz file)
+
+tar -tvf name.tar.gz (to list the files in tar.gz file)
+
+gzip filename  ----- > To gzip a file
+
+gzip -c filename > filename.gz   ---- >To keep the original file and create a new zip file:
+
+gzip -d filename.gz     ----- > To unzip the zipped file
+
+gzip -c filename > filename.gz & ------> It will do in the backend
+
+zip -r -q file.zip target_dir -x dir/fild (files/dir u want to exclude)
+
+echo '10.210.16.34' | awk -F . '{print $2"."$1}'
+
+# now use some sed magic to munge the two files
+# first create a placeholder 'tag' then munge the files using the 'r' feature of sed
+sudo sed -i 's/http {/http { \n#FROM_UPSTREAM_TEMPLATE/' /etc/nginx.conf
+sudo sed -ie '/#FROM_UPSTREAM_TEMPLATE/rupstream.conf.template' /etc/nginx.conf
+
+
+sudo lsof | grep deleted    (to get the )
+
+du -sch * 2> /dev/null | sort -n -r | head -n 10  (To sort top 10 files w.r.t size)
+
+pidof java | xargs pwdx   (To list the java processess with pids)
+
+tail -n 1000000 slapd.log >> /tmp/slap_bkp.log  (To take the last '100000' lines of the file )
+
+cat /tmp/slap_bkp.log > /var/slapd.log (Replacing the file)
+
+find ./* -iname "*" -mtime/atime/ctime +30 -delete (To delete 30 days ago files)
+
+find . -type f -iname "*" -mtime +30 -exec rm -rf {} \;    (To delete 30 days ago files)
+
+find . -iname "*" -mtime +10 -exec gzip {} \; (to gzip the files)
+
+gzip filename (it direclty gzip the files)
+
+To list the screens   : screen -ls
+
+To create new screen : screen -S screen_name
+
+To reattach the screen : screen -r Screen_name/id
+
+To delete the screen : screen -X -S screen_pid quit (ex: screen -X -S 2171 quit)
+
+To kill the screen process : ctrl + c
+
+To safe exit : ctrl 'a + d'
+
+To rename the session: screen -S old_screenname -X sessionname new_sreenname
+
+To create a screen inside a shell script: screen -d -m -S bukkit bash -c 'cd $HOME/server && java -jar bukkit.jar'
+
+ubuntu config --default-user root
+
+ps -aux --sort=-%mem | head -n10 (Memory wise)
+
+ps -aux --sort=-rss | head -n10 (Ram wise)
+
+ps -aux --sort=-%cpu | head -n10
+
+grep -R "word" . --> to search recursively in the current location
+
+grep -i duration postgresql.log.2020-06-18-13|awk '{print $5 " " $6 ":" $4 }' |sort -nr > HigherValues
+
+package-cleanup --oldkernels --count=1 -y
+
+lsof -a -p PID | wc -l
+
+lsof -u UNAME | wc -l
+
+sudo shutdown -r now	REBOOT
+sudo shutdown -h now	SHUTDOWN
+
+https://unix.stackexchange.com/questions/169798/what-does-newermt-mean-in-find-command
+
+find ./ -newermt "2016-01-18" ! -newermt '2016-01-19'
+
+password update: ssh-keygen -p -f ~/.ssh/id_rsa
+
+systemctl list-unit-files (to know about systemctl process enabled/disabled)
+
+/usr/share/filebeat/bin/filebeat --version
+/usr/share/logstash/bin/logstash --version
+/usr/share/kibana/bin/kibana --version
+/usr/share/elasticsearch/bin/elasticsearch --version
+
+cat /etc/passwd | awk 'FS=":" {print$2,$3,$6}'
+
+
+ docker run -v /var/run/docker.sock:/var/run/docker.sock -v /etc/.docker:/root/.docker devhub-docker.cisco.com/iot-dockerpreprod/iotsp/scalinator:master_62 --manifest_location https://iot-docker-user.gen:AKCp2V5pFuUeJahs7RcxKT3Uowp7YV8J9dyDz4D7sy7w2YShBCyeeQAfX2FBdQ5qN3sVqcVeR@devhub.cisco.com/artifactory/IoT-Software-Platform-Yum/scalinator/scalinator_descriptors_kl.master_PROD_20210121041253.zip --service=marathon:chronos-monitoring
+
+
+
+ls -d /var/lib/jenkins/*/   ---> only to list directories 
+
+################################################ Vagrant ###########################
+
+bcdedit /set hypervisorlaunchtype auto
+bcdedit /set hypervisorlaunchtype off
+
+https://stackoverflow.com/questions/37955942/vagrant-up-vboxmanage-exe-error-vt-x-is-not-available-verr-vmx-no-vmx-code
+
+https://forums.virtualbox.org/viewtopic.php?f=6&t=92260   (bcdedit /set hypervisorlaunchtype off)
+
+
+Enable-WindowsOptionalFeature -Online -FeatureName Microsoft-Windows-Subsystem-Linux
+
+
+\\wsl$ ----> open the console
+
+
+
+
+
+
+
+
+
+
+

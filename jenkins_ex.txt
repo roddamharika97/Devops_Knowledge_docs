@@ -1,0 +1,20 @@
+stage ("AUTOMATION : FT ") {
+
+
+steps {
+
+build job: 'magellan-ft',
+
+parameters: [
+
+string(name: 'NIGHTLY_JOB_NAME', value: String.valueOf(NIGHTLY_JOB_NAME)),
+
+string(name: 'NIGHTLY_BUILD_ID', value: String.valueOf(NIGHTLY_BUILD_ID)),
+
+string(name: 'NIGHTLY_BUILD_DATE', value: String.valueOf(NIGHTLY_BUILD_DATE)),
+
+// string(name: 'MAGLEV_CLUSTER', value: String.valueOf(targetMachineIp))
+
+]
+
+}

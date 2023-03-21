@@ -1,0 +1,18 @@
+What is terraform?
+
+
+
+SED:
+
+sed stands for stream editor, which is used to search a word in the file and replace it with the 
+word required to be in the output
+Note: it will only modify the output, but there will be no change in the original file.
+#sed ‘s/searchfor/replacewith/g’ filename
+
+Crontab format 
+*****
+* ---- > minute(0-59)
+* ---- > hour(0-23)
+* ---- > day of month (1-31)
+* ---- > month(1-12) or jan,feb, mar
+* ---- > day of week(0-6) (sunday=0)

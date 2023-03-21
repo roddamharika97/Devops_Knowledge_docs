@@ -1,0 +1,292 @@
+#!/bin/bash -v
+# shellcheck disable=SC1117
+# shellcheck disable=SC2154
+
+#Update system and install nginx
+yum update --exclude=datadog* -y
+yum install jq telnet htop dnsmasq -y
+amazon-linux-extras install nginx1 -y
+
+AWSREGION=$(curl -s http://169.254.169.254/latest/dynamic/instance-identity/document | jq .region -r)
+export AWS_DEFAULT_REGION=$AWSREGION
+ENVIRONMENT=$(cat /opt/shl/environment.txt)
+PROFILE=$(aws ssm get-parameter --name "/tc/$ENVIRONMENT/stackprofile" | jq -r ".Parameter.Value")
+
+TCIURL=$(aws ssm get-parameter --name "/tci/$ENVIRONMENT/tcilburl" | jq -r ".Parameter.Value")
+TCS3URL=$(aws ssm get-parameter --name "/tc/$ENVIRONMENT/tcs3url" | jq -r ".Parameter.Value")
+
+# TC CHINA SPECIFIC NGINX SETUP
+
+tee /etc/nginx/nginx.conf <<EOF
+# For more information on configuration, see:
+#   * Official English Documentation: http://nginx.org/en/docs/
+#   * Official Russian Documentation: http://nginx.org/ru/docs/
+
+user nginx;
+worker_processes auto;
+error_log /var/log/nginx/error.log;
+pid /run/nginx.pid;
+
+# Load dynamic modules. See /usr/share/nginx/README.dynamic.
+include /usr/share/nginx/modules/*.conf;
+
+events {
+    worker_connections 1024;
+}
+
+http {
+    log_format  main  '\$remote_addr - \$remote_user [\$time_local] "\$request" '
+                      '\$status \$body_bytes_sent "\$http_referer" '
+                      '"\$http_user_agent" "\$http_x_forwarded_for"';
+
+    access_log  /var/log/nginx/access.log  main;
+
+    sendfile            on;
+    tcp_nopush          on;
+    tcp_nodelay         on;
+    keepalive_timeout   65;
+    types_hash_max_size 2048;
+
+    include             /etc/nginx/mime.types;
+    default_type        application/octet-stream;
+
+    limit_req_zone \$http_x_forwarded_for zone=req_limit_per_ip:100m rate=480r/m;
+    limit_conn_status 403;
+
+    # Load modular configuration files from the /etc/nginx/conf.d directory.
+    # See http://nginx.org/en/docs/ngx_core_module.html#include
+    # for more information.
+    include /etc/nginx/conf.d/*.conf;
+
+    resolver 127.0.0.1;
+}
+EOF
+
+tee /etc/nginx/conf.d/regional-shl-outbound-ip-range.map <<EOF
+3.122.184.113 0;
+10.221.13.55 0;
+10.221.6.121 0;
+10.181.1.169 0;
+13.55.234.104 0;
+13.234.6.58 0;
+13.233.29.123 0;
+18.184.97.40 0;
+18.216.107.94 0;
+18.191.116.100 0;
+18.184.243.194 0;
+34.254.15.170 0;
+34.254.52.133 0;
+35.157.229.19 0;
+35.156.219.213 0;
+52.83.55.71 0;
+52.64.153.43 0;
+EOF
+
+tee /etc/nginx/conf.d/tci-nx.conf <<EOF
+map \$http_x_forwarded_for \$block {
+    include /etc/nginx/conf.d/regional-shl-outbound-ip-range.map;
+    default 1;
+}
+
+server {
+    listen       80;
+    server_name  _;
+    root         /usr/share/nginx/html;
+
+    proxy_http_version 1.1;
+    proxy_set_header x-amz-date \$date_gmt;
+    proxy_set_header Accept-Encoding "";
+    proxy_set_header Host \$proxy_host;
+
+    proxy_hide_header x-amz-delete-marker;
+    proxy_hide_header x-amz-version-id;
+    proxy_hide_header x-amz-id-2;
+    proxy_hide_header x-amz-request-id;
+    proxy_hide_header Set-Cookie;
+
+    proxy_buffering off;
+    proxy_ignore_headers "Set-Cookie";
+    proxy_intercept_errors on;
+    proxy_ssl_verify off;
+
+    add_header X-Content-Type-Options nosniff;
+    add_header X-Asset-Location \$hostname;
+    add_header Cache-Control max-age=31536000;
+    add_header X-Cache-Status \$upstream_cache_status;
+
+    real_ip_header x-forwarded-for;
+    proxy_set_header X-Real-IP \$remote_addr;
+
+    if ( \$http_user_agent ~* (moniNetAgent_1.0) ) {
+        return 403;
+    }
+
+    location ~ /[Ii][Nn][Tt][Ee][Gg][Rr][Aa][Tt][Ii][Oo][Nn][Tt][Oo][Oo][Ll][Ss] {
+        if ( \$block ) { return 403; }
+
+        proxy_pass $TCIURL;
+        proxy_redirect default;
+        proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto \$scheme;
+
+        # kill cache
+        add_header Last-Modified \$date_gmt;
+        add_header Cache-Control 'no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0';
+        add_header Pragma 'no-cache';
+        if_modified_since off;
+        expires off;
+        etag off;
+
+        break;
+    }
+
+    location /healthcheck.html {
+        proxy_pass $TCS3URL;
+        proxy_redirect default;
+        proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto \$scheme;
+        break;
+    }
+
+    location / {
+        limit_req zone=req_limit_per_ip burst=20 nodelay;
+
+        proxy_pass $TCIURL;
+        proxy_redirect default;
+        proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto \$scheme;
+
+        # kill cache
+        add_header Last-Modified \$date_gmt;
+        add_header Cache-Control 'no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0';
+        add_header Pragma 'no-cache';
+        if_modified_since off;
+        expires off;
+        etag off;
+
+        break;
+    }
+}
+EOF
+
+tee /etc/nginx/conf.d/perl-regex.conf <<EOF
+perl_modules perl/lib;
+
+perl_set \$uri_lowercase '
+    sub {
+            my \$r = shift;
+            my \$uri = \$r->uri;
+            \$uri = lc(\$uri);
+            return \$uri;
+   }
+';
+EOF
+
+tee /etc/nginx/conf.d/timeout.conf <<EOF
+proxy_connect_timeout       600;
+proxy_send_timeout          600;
+proxy_read_timeout          600;
+send_timeout                600;
+client_max_body_size 	    100M;
+EOF
+
+tee /etc/nginx/conf.d/dd_status.conf <<EOF
+server {
+  listen 81;
+  server_name localhost;
+
+  access_log off;
+  allow 127.0.0.1;
+  deny all;
+
+  location /nginx_status {
+    # This is here for Datadog monitoring
+
+    # freely available with open source NGINX
+    stub_status;
+  }
+}
+EOF
+
+# Install Datadog-agent
+DDAPIKEY=$(aws secretsmanager get-secret-value --secret-id dd_api_key --output text --query SecretString --region "$AWSREGION" | jq -r '.dd_api_key')
+
+# Install agent from rpm already copied to /opt/shl
+yum localinstall /opt/shl/datadog-agent.rpm -y
+rm -rf /opt/shl/datadog-agent.rpm
+
+systemctl stop datadog-agent
+tee /etc/datadog-agent/datadog.yaml <<EOF
+dd_url: https://app.datadoghq.com
+api_key: $DDAPIKEY
+logs_enabled: true
+log_format_json: false
+log_level: DEBUG
+log_file: /var/log/datadog/agent.log
+log_payloads: false
+log_to_console: true
+log_to_syslog: false
+logging_frequency: 20
+apm_config:
+  enabled: true
+logs_config:
+  container_collect_all: false
+  dd_port: 10516
+  dd_url: agent-intake.logs.datadoghq.com
+  dev_mode_use_proto: true
+  frame_size: 9000
+  open_files_limit: 100
+  run_path: ""
+  tcp_forward_port: -1
+tags:
+- system:talentcentral
+- application:talentcentral
+- env:tc_$PROFILE
+- tcappcode:tcinginx
+- tcappname:tcinginx
+EOF
+rm -rf /opt/shl/key.txt
+
+tee /etc/datadog-agent/conf.d/nginx.d/conf.yaml <<EOF
+  logs:
+    - type: file
+      path: /var/log/nginx/access.log
+      service: nginx
+      source: nginx
+      sourcecategory: http_web_access
+
+    - type: file
+      path: /var/log/nginx/error.log
+      service: nginx
+      source: nginx
+      sourcecategory: http_web_access
+EOF
+
+chown dd-agent:dd-agent /etc/datadog-agent/datadog.yaml
+chown dd-agent:dd-agent /etc/datadog-agent/conf.d/nginx.d/conf.yaml
+
+#Give dd-agent read access to nginx logs
+/usr/bin/setfacl -m g:dd-agent:rx /var/log/nginx
+tee /etc/logrotate.d/nginxlog_acls << EOF
+/var/log/nginx/nginxlog_rotate
+{
+    postrotate
+        /usr/bin/setfacl -m g:dd-agent:rx /var/log/nginx
+        /usr/bin/setfacl -m g:dd-agent:rx /var/log/nginx/access.log
+        /usr/bin/setfacl -m g:dd-agent:rx /var/log/nginx/error.log
+        touch /var/log/nginx/nginxlog_rotate
+    endscript
+}
+EOF
+touch /var/log/nginx/nginxlog_rotate
+chmod 0665 /etc/logrotate.d/nginxlog_acls
+chmod 0665 /var/log/nginx/nginxlog_rotate
+logrotate -vf /etc/logrotate.d/nginxlog_acls
+
+#enable services
+systemctl enable dnsmasq
+systemctl enable datadog-agent
+systemctl enable nginx
+
+#reboot to apply patches
+reboot

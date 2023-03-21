@@ -1,0 +1,23 @@
+sonarqube : 9000
+jenkins   : 8080
+Tomcat	  : 8080
+httpd     : 80
+http: 80
+https: 443
+nginx     : 80
+nexus     : 8081
+SSH	  : 22
+postresql : 5432 
+SQL server: 1433
+jacoco    : 6300
+elasticsearch : 9200
+logstash : 5000
+kibana : 5601
+grafana : 80
+influx db : 8086
+prometheus :9090
+kapacitor : 9092
+nagios	: 80
+Zabbix  : 10051
+rabbitmq : 5672
+ETCD:	2379

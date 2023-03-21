@@ -1,0 +1,31 @@
+IAM 
+
+1.https://medium.com/tensult/aws-policies-with-examples-8340661d35e9
+open this link
+click ctrl+F and search for below lines 
+Let us see some of the useful IAM policies.
+you will get the required answer
+
+2.https://aws.amazon.com/iam/faqs/
+ click ctrl+F and search for below lines
+IAM role management
+
+3.To rotate access keys, you should follow these steps:
+
+Create a second access key in addition to the one in use.
+Update all your applications to use the new access key and validate that the applications are working.
+Change the state of the previous access key to inactive.
+Validate that your applications are still working as expected.
+Delete the inactive access key.
+https://aws.amazon.com/blogs/security/how-to-rotate-access-keys-for-iam-users/
+click ctrl+F and search for below lines
+To rotate access keys, you should follow these steps:
+
+
+4.https://docs.aws.amazon.com/IAM/latest/UserGuide/id_groups_manage_attach-policy.html
+
+5?
+
+6.Select Programmatic access if the users require access to the API, AWS CLI, or Tools for Windows PowerShell. This creates an access key for each new user. You can view or download the access keys when you get to the Final page.
+
+Select AWS Management Console access if the users require access to the AWS Management Console. This creates a password for each new user.

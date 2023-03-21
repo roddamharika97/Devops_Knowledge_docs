@@ -1,0 +1,108 @@
+VPC:
+
+What are the different services u worked in aws?
+
+EC2, s3.vpc, load balancer,IAM, auto-scaling
+
+What is the difference between private subnet vs public subnet?
+
+The instances in the public subnet can send outbound traffic directly to the internet, whereas the instances in the private subnet can't. Instead, the instances in the private subnet can access the internet by using a network address translation (NAT) gateway that resides in the public subnet. The database servers can connect to the internet for software updates using the NAT gateway, but the internet cannot establish connections to the database servers.
+
+
+How do I get internet connectivity to the instances posted in private subnet?
+
+You should use NAT gateway for connecting to internet from ec2-instances. NAT gateway is an AWS service, so it scales and reliable.
+Go to the VPC dashboard
+Create a NAT Gateway in the public subnet*. Ensure you are creating the NAT Gateway in public subnet only.
+Attach an Elastic IP Address* to the NAT Gateway. Now a routing should be added to your private subnet
+Go to private subnet’s routing table.  Add a route to internet through NAT
+Destination as 0.0.0.0/0 and Target as NAT gateway
+And attach an internet gateway to the public subnet. And a routing 0.0.0.0/0 with target as internet gateway
+
+
+Db servers are hosted in which subnet?
+
+Private subnet.
+
+
+What is natgateway & internet gateway?
+
+Internet Gateway (IGW) allows instances with public IPs to access the internet.
+NAT Gateway (NGW) allows instances with no public IPs to access the internet.
+
+
+can one route associated with multiple oute tables or not?
+
+Each subnet in your VPC must be associated with a route table, which controls the routing for the subnet (subnet route table). You can explicitly associate a subnet with a particular route table. Otherwise, the subnet is implicitly associated with the main route table. A subnet can only be associated with one route table at a time, but you can associate multiple subnets with the same subnet route table.
+
+
+Can 1 route table have multiple subnets or not?
+
+You can explicitly associate a subnet with a particular route table. Otherwise, the subnet is implicitly associated with the main route table. A subnet can only be associated with one route table at a time, but you can associate multiple subnets with the same subnet route table.
+
+
+What is vpc & its use cases?
+
+With VPC, you can control inbound and outbound access for your resources in your own virtual private network and connect your data center with AWS cloud securely along with other VPCs in your AWS accounts and VPCs in other AWS accounts.
+
+
+vpc components?
+
+IPv4 and IPv6 address blocks.
+Subnet creation.
+Route tables.
+Internet connectivity.
+Elastic IP addresses (EIPs)
+Network/subnet security.
+Additional networking services.
+
+
+EC2:
+Can we attach multiple private address to 1 ec2 instance? How? ------> doubt
+can we modify security group settings after creating the ec2 instance? -----> doubt
+What is security group & nacl?
+What is inbound & outbound traffic?
+How do you encrypt volumes in ec2? -----> doubt
+is it possible to encrypt volume after ec2 creation?
+How frequently you take the snapshots of ec2 volumes?
+
+Load balancers:
+
+
+What are the different load balancers?
+Which load balancer you are using in your organisation?
+Application lb - layer 7
+classic lb - layer 4
+What is layer 7 & layer 4?
+What is stickyness?
+What is healthy & unhealthy treshhold , time intervals?
+what is target group in load balancer & how do you attach & detach instances through target groups?
+What is vertical autoscaling vs horizontal autoscaling?
+What is min max desired capacity in autoscaling?
+AMI - Amazon machine image
+How do you take ami's automatically?
+
+IAM: ------> doubt
+
+What are policies in IAM?
+What are roles in IAM?
+If any one of the iam key's expires how do you rotate them?
+How do you attach policies to groups?
+What is group & user?
+What is difference between programatic access vs console access?
+
+S3:
+
+How do you host static website with help of s3?
+What are different storage types in s3?
+Which storage type you used in your organisation?
+What is versioing in s3 bucket?
+How do you make communication bettween ec2 & s3?
+What are the different volume types?
+What is lambda function in aws?
+what is s3 object vs bucket?
+What is paas, saas, iaas?
+What is eks?
+what is cloud watch?
+plottted graphs?
+

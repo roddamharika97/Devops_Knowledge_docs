@@ -1,0 +1,25 @@
+What is the command to get total num of runtime arguments passed to a shell script?
+
+echo $#
+
+Command to print the runtime arguments passed to a shell script?
+
+echo $* , echo $@
+
+Command to print the name of the shell script?
+
+echo $$
+
+Command to know the status of previous command?
+
+echo $?
+
+
+$1, $2, $3 etc. represent the first, second, third, etc. arguments to the script.
+$# represents the number of arguments.
+$* represents the string of arguments.
+$0 represents the name of the script itself.
+$? represents the return code of the previously run command (0=success).
+$$ shows the process ID for the script.
+$PPID shows the process ID for your shell (the parent process for the scrip
+

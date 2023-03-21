@@ -1,0 +1,116 @@
+
+kubectl --kubeconfig kubeconfig.yaml get nodes   
+
+kubectl --kubeconfig kubeconfig.yaml get pods -A -o wide --field-selector spec.nodeName=<NODE_NAME>
+
+kubectl --kubeconfig kubeconfig.yaml cordon <NODE_NAME>
+
+kubectl --kubeconfig kubeconfig.yaml drain <NODE_NAME> --ignore-daemonsets --delete-local-data
+
+kubectl --kubeconfig kubeconfig.yaml delete pods/<POD_NAME>
+
+kubectl exec --stdin --tty shell-demo -- /bin/bash
+
+Note: The short options -i and -t are the same as the long options --stdin and --tty
+
+kubectl exec -it <container_name/pod_name> -- /bin/bash (single pod)
+
+kubectl exec -i -t <pod_name> --container <contianer_name> -- /bin/bash (to enter into shell of the program)
+
+kubectl exec <pod_name> -c container <container> <commands>
+
+kubectl exec shell-demo -- ps aux   (running individual commands)
+
+kubectl port-forward kibana-kibana-889b6b85b-smz9q 1098:5601 --kubeconfig $kc -n logging   (port forwarding)
+
+kubectl logs <podname> -c <containername> --kubeconfgi $file -n <namespace>
+
+kubectl edit  ReplicaSet/kibana-kibana-889b6b85b -n logging --kubeconfig $kc
+
+kk scale deployment vault-secrets-webhook -n vault-infra --replicas=0
+
+kk scale deployment vault-secrets-webhook -n vault-infra --replicas=2
+
+kk describe pod <pod_name> -o yaml > filname.yaml
+
+kk get secrets prometheus-operator-grafana -n monitoring -o yaml
+
+kubectl --kubeconfig ./EU/eu1.yaml get configmap -l app=prometheus-operator-grafana -n monitoring
+
+kubectl create service clusterip my-svc --clusterip="None" -o yaml --dry-run=client > /tmp/srv.yaml
+
+kk get secret prometheus-operator-grafana -n monitoring -o yaml
+
+kubectl create deployment --image=nginx nginx-app
+
+kk run -it --rm centosrds -n rainier --image=postgres --restart=Never -- /bin/bash
+
+kubectl label node <nodename> node-role.kubernetes.io/worker=worker
+
+kubectl taint nodes worker1 node.kubernetes.io/not-ready:NoSchedule-
+
+kubectl cp -n <namespace> pod:<path to file> <desination-file-path>
+
+kk scale --replicas=0 deployments/<name> -n <namespace>
+
+kk scp pod:<file loctation> <desitnation file location>
+
+kubectl explain persistentvolume --recursive | less 
+
+kubectl get pods -L tenant -n ei (tenant info)
+
+kubectl delete deployment nginx -n default
+
+kubectl config current-context
+
+
+#####################################################################
+kk run -it --rm centosrds -n rainier --image=postgres --restart=Never -- /bin/bash
+psql --host=rds-rainier-pg.rainier --port=5432 --username=rainierdbuser --dbname=cgms --password
+
+set search_path to cgms_dev,public;
+
+
+
+psql --host rds-rainier-pg.rainier --port 5432 -U rainierdbuser -d rainierdb
+
+select state, usename, count(*) from pg_stat_activity where usename is not null and state is not null group by usename,state;
+
+
+
+
+###############333 thingsboard license #######################
+
+vault kv get secret/infra/shared/licenses/at/tb/license ( will return you a1b2c3.....)
+
+vault kv put secret/infra/shared/licenses/at/tb/license value='<LICENSE_HERE>'
+
+vault kv get secret/infra/shared/licenses/at/tb/license ( new license ID to be refeclted )
+
+
+
+
+
+###################### at sequnce ############################
+kubectl rollout restart statefulset.apps/at-mq-asset-tracking-vernemq -n at
+kubectl rollout status statefulset.apps/at-mq-asset-tracking-vernemq -n at
+
+kubectl rollout restart deployment.apps/at-tb-thingsboard -n at
+kubectl rollout status deployment.apps/at-tb-thingsboard -n at
+
+kubectl rollout restart deployment.apps/at-cgb-us-chirpstack-gateway-bridge -n at
+kubectl rollout status deployment.apps/at-cgb-us-chirpstack-gateway-bridge -n at
+
+kubectl rollout restart deployment.apps/at-cns-us-chirpstack-network-server -n at
+kubectl rollout status deployment.apps/at-cns-us-chirpstack-network-server -n at
+
+kubectl rollout restart deployment.apps/at-cas-chirpstack-application-server -n at
+kubectl rollout status deployment.apps/at-cas-chirpstack-application-server -n at
+
+kubectl rollout restart deployment.apps/at-be-asset-tracking-be -n at
+kubectl rollout status deployment.apps/at-be-asset-tracking-be -n at
+
+kubectl rollout restart deployment.apps/at-ui-asset-tracking-ui -n at
+kubectl rollout status deployment.apps/at-ui-asset-tracking-ui -n at
+
+ref: https://jira-eng-sjc6.cisco.com/jira/browse/YSOPS-1626
